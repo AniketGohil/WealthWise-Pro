@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Portfolio Tracker</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+            text-align: center;
+        }
+        .container {
+            margin-top: 40px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: none;
+        }
+        button {
+            background: #22c55e;
+            color: white;
+            cursor: pointer;
+        }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 80%;
+        }
+        th, td {
+            border: 1px solid #444;
+            padding: 10px;
+        }
+        th {
+            background: #1e293b;
+        }
+        .profit { color: #22c55e; }
+        .loss { color: #ef4444; }
+        .summary {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📊 Portfolio Tracker</h1>
+
+    <input type="text" id="stock" placeholder="Stock (e.g. INFY.NS)">
+    <input type="number" id="qty" placeholder="Quantity">
+    <input type="number" id="price" placeholder="Buy Price">
+
+    <br>
+    <button onclick="addStock()">Add Stock</button>
+    <button onclick="clearAll()">Clear</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Stock</th>
+                <th>Qty</th>
+                <th>Buy Price</th>
+                <th>Current Price</th>
+                <th>Value</th>
+                <th>P/L</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+
+    <div class="summary" id="summary"></div>
+</div>
+
+<script>
+let portfolio = [];
+
+function addStock() {
+    let stock = document.getElementById("stock").value.toUpperCase();
+    let qty = parseFloat(document.getElementById("qty").value);
+    let buyPrice = parseFloat(document.getElementById("price").value);
+
+    if (!stock || !qty || !buyPrice) {
+        alert("Fill all fields!");
+        return;
+    }
+
+    // Simulated current price
+    let currentPrice = buyPrice + (Math.random() * 200 - 100);
+
+    let value = qty * currentPrice;
+    let investment = qty * buyPrice;
+    let profit = value - investment;
+
+    portfolio.push({ stock, qty, buyPrice, currentPrice, value, profit });
+
+    renderTable();
+}
+
+function renderTable() {
+    let tbody = document.getElementById("tableBody");
+    tbody.innerHTML = "";
+
+    let totalInvestment = 0;
+    let totalValue = 0;
+
+    portfolio.forEach(item => {
+        totalInvestment += item.qty * item.buyPrice;
+        totalValue += item.value;
+
+        let row = `
+            <tr>
+                <td>${item.stock}</td>
+                <td>${item.qty}</td>
+                <td>₹${item.buyPrice.toFixed(2)}</td>
+                <td>₹${item.currentPrice.toFixed(2)}</td>
+                <td>₹${item.value.toFixed(2)}</td>
+                <td class="${item.profit >= 0 ? 'profit' : 'loss'}">
+                    ₹${item.profit.toFixed(2)}
+                </td>
+            </tr>
+        `;
+        tbody.innerHTML += row;
+    });
+
+    let totalProfit = totalValue - totalInvestment;
+
+    document.getElementById("summary").innerHTML = `
+        💼 Investment: ₹${totalInvestment.toFixed(2)} <br>
+        📈 Current Value: ₹${totalValue.toFixed(2)} <br>
+        🔥 Profit/Loss: <span class="${totalProfit >= 0 ? 'profit' : 'loss'}">
+        ₹${totalProfit.toFixed(2)}</span>
+    `;
+}
+
+function clearAll() {
+    portfolio = [];
+    renderTable();
+}
+</script>
+
+</body>
+</html>
